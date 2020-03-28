@@ -330,6 +330,19 @@ final case class NonEmptyList[+A](head: A, tail: List[A]) extends NonEmptyCollec
     NonEmptyList((head, 0), bldr.result)
   }
 
+  def zipAll[B, AA >: A](bs: NonEmptyList[B], a: AA, b: B): NonEmptyList[(AA, B)] = {
+
+    @tailrec
+    def go(as: List[A], bs: List[B], acc: List[(AA, B)]): List[(AA, B)] = (as, bs) match {
+      case (Nil, Nil)         => acc
+      case (Nil, y :: ys)     => go(Nil, ys, (a, y) :: acc)
+      case (x :: xs, Nil)     => go(xs, Nil, (x, b) :: acc)
+      case (x :: xs, y :: ys) => go(xs, ys, (x, y) :: acc)
+    }
+
+    NonEmptyList((head, bs.head), go(tail, bs.tail, Nil).reverse)
+  }
+
   /**
    * Sorts this `NonEmptyList` according to an `Order` on transformed `B` from `A`
    *
@@ -515,11 +528,8 @@ sealed abstract private[data] class NonEmptyListInstances extends NonEmptyListIn
 
   implicit val catsDataInstancesForNonEmptyList
     : SemigroupK[NonEmptyList] with Bimonad[NonEmptyList] with NonEmptyTraverse[NonEmptyList] with Align[NonEmptyList] =
-    new NonEmptyReducible[NonEmptyList, List]
-      with SemigroupK[NonEmptyList]
-      with Bimonad[NonEmptyList]
-      with NonEmptyTraverse[NonEmptyList]
-      with Align[NonEmptyList] {
+    new NonEmptyReducible[NonEmptyList, List] with SemigroupK[NonEmptyList] with Bimonad[NonEmptyList]
+    with NonEmptyTraverse[NonEmptyList] with Align[NonEmptyList] {
 
       def combineK[A](a: NonEmptyList[A], b: NonEmptyList[A]): NonEmptyList[A] =
         a.concatNel(b)
@@ -598,12 +608,13 @@ sealed abstract private[data] class NonEmptyListInstances extends NonEmptyListIn
           case Left(b)  => Ior.left(NonEmptyList.one(b))
         }
 
-        reversed.tail.foldLeft(lastIor)((ior, a) =>
-          (f(a), ior) match {
-            case (Right(c), Ior.Left(_)) => ior.putRight(NonEmptyList.one(c))
-            case (Right(c), _)           => ior.map(c :: _)
-            case (Left(b), Ior.Right(r)) => Ior.bothNel(b, r)
-            case (Left(b), _)            => ior.leftMap(b :: _)
+        reversed.tail.foldLeft(lastIor)(
+          (ior, a) =>
+            (f(a), ior) match {
+              case (Right(c), Ior.Left(_)) => ior.putRight(NonEmptyList.one(c))
+              case (Right(c), _)           => ior.map(c :: _)
+              case (Left(b), Ior.Right(r)) => Ior.bothNel(b, r)
+              case (Left(b), _)            => ior.leftMap(b :: _)
           }
         )
 

@@ -239,6 +239,9 @@ final class NonEmptyVector[+A] private (val toVector: Vector[A])
   def zipWithIndex: NonEmptyVector[(A, Int)] =
     new NonEmptyVector(toVector.zipWithIndex)
 
+  def zipAll[B, AA >: A](bs: NonEmptyVector[B], a: AA, b: B): NonEmptyVector[(AA, B)] =
+    new NonEmptyVector(toVector.zipAll(bs.toVector, a, b))
+
   def sortBy[B](f: A => B)(implicit B: Order[B]): NonEmptyVector[A] =
     new NonEmptyVector(toVector.sortBy(f)(B.toOrdering))
 

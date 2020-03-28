@@ -378,6 +378,8 @@ class NonEmptyChainOps[A](private val value: NonEmptyChain[A])
   final def zipWith[B, C](b: NonEmptyChain[B])(f: (A, B) => C): NonEmptyChain[C] =
     create(toChain.zipWith(b.toChain)(f))
 
+  final def zipAll[B, AA >: A](bs: NonEmptyChain[B], a: AA, b: B): NonEmptyChain[(AA, B)] = ???
+
   /**
    * Groups elements inside this `NonEmptyChain` according to the `Order`
    * of the keys produced by the given mapping function.

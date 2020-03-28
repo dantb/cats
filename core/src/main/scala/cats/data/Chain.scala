@@ -335,6 +335,23 @@ sealed abstract class Chain[+A] {
     case Wrap(seq) => Wrap(seq.zipWithIndex)
   }
 
+//  /**
+//   * Zips each element of this `Chain` with its index.
+//   */
+//  final def zipAll[B, AA >: A](other: Chain[B], a: AA, b: B): Chain[(AA, B)] =
+//    if (this.isEmpty || other.isEmpty) Chain.Empty
+//    else {
+//      val iterA = iterator
+//      val iterB = other.iterator
+//
+//      var result: Chain[(A, B)] = Chain.one(f(iterA.next(), iterB.next()))
+//
+//      while (iterA.hasNext && iterB.hasNext) {
+//        result = result :+ f(iterA.next(), iterB.next())
+//      }
+//      result
+//    }
+
   /**
    * Groups elements inside this `Chain` according to the `Order`
    * of the keys produced by the given mapping function.

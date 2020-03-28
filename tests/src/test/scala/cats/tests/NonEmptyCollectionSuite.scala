@@ -6,7 +6,8 @@ import org.scalacheck.Arbitrary
 
 abstract class NonEmptyCollectionSuite[U[+_], NE[+_], NEC[x] <: NonEmptyCollection[x, U, NE]](
   implicit arbitraryU: Arbitrary[U[Int]],
-  arbitraryNE: Arbitrary[NE[Int]]
+  arbitraryNE: Arbitrary[NE[Int]],
+  arbitraryNEString: Arbitrary[NE[String]]
 ) extends CatsSuite {
   protected def toList[A](value: NE[A]): List[A]
   protected def underlyingToList[A](underlying: U[A]): List[A]
@@ -120,6 +121,12 @@ abstract class NonEmptyCollectionSuite[U[+_], NE[+_], NEC[x] <: NonEmptyCollecti
   test("zipWithIndex is consistent with iterator.toList.zipWithIndex") {
     forAll { (is: NE[Int]) =>
       toList(is.zipWithIndex) should ===(is.iterator.toList.zipWithIndex)
+    }
+  }
+
+  test("zipAll is consistent with iterator.toList.zipAll") {
+    forAll { (is: NE[Int], other: NE[String], a: Int, b: String) =>
+      toList(is.zipAll(other, a, b)) should ===(is.iterator.toList.zipAll(other.iterator.toList, a, b))
     }
   }
 

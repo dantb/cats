@@ -39,9 +39,9 @@ trait CatsSuite
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
     checkConfiguration
 
-  def even(i: Int): Boolean = i % 2 == 0
+//  def even(i: Int): Boolean = i % 2 == 0
 
-  val evenPf: PartialFunction[Int, Int] = { case i if even(i) => i }
+//  val evenPf: PartialFunction[Int, Int] = { case i if even(i) => i }
 }
 
 trait SlowCatsSuite extends CatsSuite {
